@@ -1,0 +1,24 @@
+{
+    "id": "E8BFA8C0",
+    "path": "~/Code/r/packages/clvotes/R/divisions.R",
+    "project_path": "R/divisions.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1602837452437.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "cursorPosition": "506,0",
+        "scrollLine": "326"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1602857725,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1602857725785,
+    "read_only": false,
+    "read_only_alternatives": []
+}

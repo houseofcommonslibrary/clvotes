@@ -1,26 +1,3 @@
-### Utility functions
-
-#' Processes hidden pagination of results retrieved from the API
-#'
-#' @param url The full API URL specifying the endpoint and request parameters.
-#' @keywords internal
-
-process_pagination <- function(url) {
-
-    # Get number of divisions
-    total_divisions <- request(stringr::str_glue("{API_TOTAL}"))
-
-    # Skip amount
-    skip_amount <- seq(0, total_divisions, by = 25)
-
-    # Loop pagination
-    purrr::map_df(skip_amount, function(amount) {
-        request(stringr::str_glue("{url}?queryParameters.skip={amount}"), tibble = TRUE)
-    })
-
-}
-
-
 
 # Filter dates ----------------------------------------------------------------
 
@@ -147,3 +124,4 @@ parse_date <- function(date_str) {
         as.Date(date_str, origin = "1970-01-01"),
         error = function(e) stop(date_format_error(date_str)))
 }
+
