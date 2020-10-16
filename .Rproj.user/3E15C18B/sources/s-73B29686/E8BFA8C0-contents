@@ -107,7 +107,7 @@ fetch_cds_raw_filter <- function(
 
 #' Fetch key details on all Commons divisions
 #'
-#' \code{fetch_cds_all} fetches data from the Commons Votes API
+#' \code{fetch_cds_all} fetches a dataframe from the Commons Votes API
 #' showing key details about each division, with one row per division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
@@ -155,7 +155,7 @@ fetch_cds_all <- function(
 
 #' Fetch key details on all Commons EVEL divisions
 #'
-#' \code{fetch_cds_evel} fetches data from the Commons Votes API
+#' \code{fetch_cds_evel} fetches a dataframe from the Commons Votes API
 #' showing key details about each EVEL division, with one row per EVEL division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
@@ -209,7 +209,7 @@ fetch_cds_evel <- function(
 
 #' Fetch key details on all Commons deferred divisions
 #'
-#' \code{fetch_cds_deferred} fetches data from the Commons Votes API
+#' \code{fetch_cds_deferred} fetches a dataframe from the Commons Votes API
 #' showing key details about each deferred division, with one row per deferred division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
@@ -260,7 +260,7 @@ fetch_cds_deferred <- function(
 
 #' Fetch key details on all Commons divisions tellers
 #'
-#' \code{fetch_cds_tellers} fetches data from the Commons Votes API
+#' \code{fetch_cds_tellers} fetches a dataframe from the Commons Votes API
 #' showing key details about each division teller, with one row per division
 #' teller.
 #'
@@ -438,7 +438,8 @@ fetch_cds_votes <- function(division_id) {
             .data$given_name,
             .data$family_name,
             .data$display_name,
-            .data$gender)
+            .data$gender,
+            .data$member_party)
 
 }
 

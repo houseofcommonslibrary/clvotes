@@ -75,6 +75,11 @@ format_cds_votes_raw <- function(df) {
         dplyr::mutate_if(is.character, stringr::str_trim)
 }
 
+#' Format raw Commons divisions members tibble
+#'
+#' @param df The divisions member tibble retrieved from the API
+#' @keywords internal
+
 format_cds_members_raw <- function(df) {
 
     # Column names
