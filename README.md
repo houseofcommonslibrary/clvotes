@@ -161,3 +161,24 @@ clvotes::fetch_lords_divisions_members(division_id, from_date = NA, to_date = NA
 Fetch a dataframe of key details about the division voting record of aLord, with one row per division.
 
 This dataframe contains summary details on the voting record of a Lord, such as the division date, title, whether the Lord voted "Content" and whether the Lord was a teller.
+
+---
+
+## Raw queries
+Functions to download the 'raw' equivalents of `fetch_commons_divisions_all` and `fetch_lords_divisions_all`. These functions convert the JSON returned from the relevant API call into a Tibble with column names cleaned. No sub-selecting of columns and variable names occurs.
+
+---
+
+```r
+clvotes::fetch_commons_divisions_all_raw(from_date = NA, to_date = NA, on_date = NA)
+```
+
+Fetch a dataframe of all data associated with a division from the Commons Votes API endpoint `/data/divisions.json/search`. No cleaning of the data occurs and so columns may be duplicated and contain nested lists or dataframes. This function is intended for users to develop further queries not provided in the core functions of this package. 
+
+---
+
+```r
+clvotes::fetch_lords_divisions_all_raw(from_date = NA, to_date = NA, on_date = NA)
+```
+
+Fetch a dataframe of all data associated with a division from the Lords Votes API endpoint `/data/Divisions/search`. No cleaning of the data occurs and so columns may be duplicated and contain nested lists or dataframes. This function is intended for users to develop further queries not provided in the core functions of this package. 
