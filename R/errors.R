@@ -1,4 +1,4 @@
-### Package errors
+### Functions for generating error messages
 
 #' Report an error with a http response
 #'

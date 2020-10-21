@@ -1,5 +1,4 @@
-
-# Filter dates ----------------------------------------------------------------
+### Functions for filtering dates
 
 #' Filter a tibble of data based on the given from and to dates.
 #'

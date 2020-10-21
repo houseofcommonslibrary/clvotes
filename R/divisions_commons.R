@@ -1,4 +1,4 @@
-### Functions for downloading divisions data
+### Functions for downloading Commons divisions data
 
 # Raw Commons divisions queries -----------------------------------------------
 
@@ -7,7 +7,7 @@
 #' @keywords internal
 
 fetch_cds_raw <- function() {
-    divisions <- process_pagination(stringr::str_glue("{API_GENERAL}search"))
+    divisions <- process_cds_pagination(stringr::str_glue("{API_COMMONS_GENERAL}search"))
     divisions <- format_cds_raw(divisions)
     assign(CACHE_CDS_RAW, divisions, envir = cache)
     divisions
@@ -20,15 +20,14 @@ fetch_cds_raw <- function() {
 fetch_cds_votes_raw <- function(division_id) {
 
     divisions <- purrr::map_df(division_id, function(id) {
-        division <- request(stringr::str_glue("{API_SINGLE}{id}.json"))
+        division <- request(stringr::str_glue("{API_COMMONS_SINGLE}{id}.json"))
         tibble::tibble(
                 division_id = division$DivisionId,
-                division_number = division$Number,
                 division_date = division$Date,
                 division_title = division$Title,
                 aye_votes = list(division$Ayes),
                 no_votes = list(division$Noes),
-                abstained = list(division$NoVoteRecorded))
+                no_vote_recorded = list(division$NoVoteRecorded))
     })
 
     # Return
@@ -47,8 +46,8 @@ fetch_cds_members_raw <- function(
 
     member_ids <- member_mnis_id
     divisions <- purrr::map_df(member_ids, function(id) {
-        divisions <- process_pagination_member(
-            stringr::str_glue("{API_GENERAL}membervoting"),
+        divisions <- process_cds_pagination_member(
+            stringr::str_glue("{API_COMMONS_GENERAL}membervoting"),
             id)
     })
     divisions <- format_cds_members_raw(divisions)
@@ -107,7 +106,7 @@ fetch_cds_raw_filter <- function(
 
 #' Fetch key details on all Commons divisions
 #'
-#' \code{fetch_cds_all} fetches a dataframe from the Commons Votes API
+#' \code{fetch_commons_divisions_all} fetches a dataframe from the Commons Votes API
 #' showing key details about each division, with one row per division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
@@ -131,7 +130,7 @@ fetch_cds_raw_filter <- function(
 #' per division.
 #' @export
 
-fetch_cds_all <- function(
+fetch_commons_divsions_all <- function(
     from_date = NA,
     to_date = NA,
     on_date = NA) {
@@ -146,7 +145,6 @@ fetch_cds_all <- function(
     divisions %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$aye_count,
@@ -155,8 +153,9 @@ fetch_cds_all <- function(
 
 #' Fetch key details on all Commons EVEL divisions
 #'
-#' \code{fetch_cds_evel} fetches a dataframe from the Commons Votes API
-#' showing key details about each EVEL division, with one row per EVEL division.
+#' \code{fetch_commons_divisions_evel} fetches a dataframe from the Commons
+#' Votes API showing key details about each EVEL division, with one row per
+#' EVEL division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
 #' on the dates they occurred. The on_date argument is a convenience that sets
@@ -179,7 +178,7 @@ fetch_cds_all <- function(
 #' per EVEL division.
 #' @export
 
-fetch_cds_evel <- function(
+fetch_commons_divisions_evel <- function(
     from_date = NA,
     to_date = NA,
     on_date = NA) {
@@ -196,7 +195,6 @@ fetch_cds_evel <- function(
             !is.na(.data$evel_type)) %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$evel_type,
@@ -209,8 +207,9 @@ fetch_cds_evel <- function(
 
 #' Fetch key details on all Commons deferred divisions
 #'
-#' \code{fetch_cds_deferred} fetches a dataframe from the Commons Votes API
-#' showing key details about each deferred division, with one row per deferred division.
+#' \code{fetch_commons_divisions_deferred} fetches a dataframe from the Commons
+#' Votes API showing key details about each deferred division, with one row per
+#' deferred division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
 #' on the dates they occurred. The on_date argument is a convenience that sets
@@ -233,7 +232,7 @@ fetch_cds_evel <- function(
 #' per deferred division.
 #' @export
 
-fetch_cds_deferred <- function(
+fetch_commons_divisions_deferred <- function(
     from_date = NA,
     to_date = NA,
     on_date = NA) {
@@ -250,7 +249,6 @@ fetch_cds_deferred <- function(
             .data$is_deferred == TRUE) %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$aye_count,
@@ -260,9 +258,120 @@ fetch_cds_deferred <- function(
 
 #' Fetch key details on all Commons divisions tellers
 #'
-#' \code{fetch_cds_tellers} fetches a dataframe from the Commons Votes API
-#' showing key details about each division teller, with one row per division
-#' teller.
+#' \code{fetch_commons_divisions_tellers} fetches a dataframe from the Commons
+#' Votes API showing key details about each division teller, with one row per
+#' division teller.
+#'
+#' The from_date and to_date arguments can be used to filter divisions based
+#' on the dates they occurred. The on_date argument is a convenience that sets
+#' the from_date and to_date to the same given date. The on_date has priority:
+#' if the on_date is set, the from_date and to_date are ignored.
+#'
+#' Divisions with zero tellers are ignored.
+#'
+#' @param from_date A string or Date representing a date. If a string is used
+#'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
+#'   default value is NA, which means no records are excluded on the basis of
+#'   the from_date.
+#' @param to_date A string or Date representing a date. If a string is used
+#'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
+#'   default value is NA, which means no records are excluded on the basis of
+#'   the to_date.
+#' @param on_date A string or Date representing a date. If a string is used
+#'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
+#'   default value is NA, which means no records are excluded on the basis of
+#'   the on_date.
+#' @return A tibble of key details of tellers for each Lords division, with one row
+#' per teller.
+#' @export
+
+fetch_commons_divisions_tellers <- function(
+    from_date = NA,
+    to_date = NA,
+    on_date = NA) {
+
+    # Fetch / filter raw data
+    divisions <- fetch_cds_raw_filter(
+        from_date,
+        to_date,
+        on_date)
+
+    tryCatch({
+
+        # Extract tellers and bind rows
+        aye_tellers <- divisions %>%
+            tidyr::unnest(.data$aye_tellers) %>%
+            dplyr::mutate(division_lobby = "Aye") %>%
+            janitor::clean_names() %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$division_lobby,
+                .data$member_id,
+                .data$party,
+                .data$member_from)
+
+        no_tellers <- divisions %>%
+            tidyr::unnest(.data$no_tellers) %>%
+            dplyr::mutate(
+                division_lobby = "No") %>%
+            janitor::clean_names() %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$division_lobby,
+                .data$member_id,
+                .data$party,
+                .data$member_from)
+
+        # Bind
+        divisions <- dplyr::bind_rows(aye_tellers, no_tellers)
+        divisions <- divisions %>%
+            dplyr::rename(
+                mnis_id = member_id,
+                member_party = party,
+                member_constituency = member_from)
+        divisions$mnis_id %<>% as.character()
+
+        # Join
+        members <- fetch_mps()
+        divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
+
+        # Return
+            divisions %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$division_lobby,
+                .data$mnis_id,
+                .data$given_name,
+                .data$family_name,
+                .data$display_name,
+                .data$gender)
+        },
+        error = function(c) {
+            tibble::tibble(
+                division_id = as.character(NA),
+                division_date = as.Date(NA),
+                division_title = as.character(NA),
+                division_lobby = as.character(NA),
+                mnis_id = as.character(NA),
+                given_name = as.character(NA),
+                family_name = as.character(NA),
+                display_name = as.character(NA),
+                gender = as.character(NA))
+        }
+    )
+}
+
+#' Fetch key details on all Commons remote divisions
+#'
+#' \code{fetch_commons_divisions_remote} fetches a dataframe from the Commons
+#' Votes API showing key details about each remote division, with one row per
+#' remote division.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
 #' on the dates they occurred. The on_date argument is a convenience that sets
@@ -281,11 +390,11 @@ fetch_cds_deferred <- function(
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
 #'   default value is NA, which means no records are excluded on the basis of
 #'   the on_date.
-#' @return A tibble of key details for each Commons deferred division, with one row
-#' per deferred division.
+#' @return A tibble of key details of remote Commons divisions, with one row
+#' per remote division.
 #' @export
 
-fetch_cds_tellers <- function(
+fetch_commons_divisions_remote <- function(
     from_date = NA,
     to_date = NA,
     on_date = NA) {
@@ -296,77 +405,31 @@ fetch_cds_tellers <- function(
         to_date,
         on_date)
 
-    # Extract tellers and bind rows
-    aye_tellers <- divisions %>%
-        tidyr::unnest(.data$aye_tellers) %>%
-        janitor::clean_names() %>%
-        dplyr::mutate(division_lobby = "Aye") %>%
+    # Return
+    divisions %>%
+        dplyr::filter(
+            !is.na(.data$remote_voting_start)) %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
-            .data$division_lobby,
-            .data$member_id,
-            .data$party,
-            .data$member_from)
-
-    no_tellers <- divisions %>%
-        tidyr::unnest(.data$no_tellers) %>%
-        janitor::clean_names() %>%
-        dplyr::mutate(
-            division_lobby = "No") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_number,
-            .data$division_date,
-            .data$division_title,
-            .data$division_lobby,
-            .data$member_id,
-            .data$party,
-            .data$member_from)
-
-   # Bind
-   divisions <- dplyr::bind_rows(aye_tellers, no_tellers)
-   divisions <- divisions %>%
-       dplyr::rename(
-           mnis_id = member_id,
-           member_party = party,
-           member_constituency = member_from)
-   divisions$mnis_id %<>% as.character()
-
-   # Join
-   members <- fetch_mps()
-   divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
-
-   # Return
-   divisions %>%
-       dplyr::select(
-           .data$division_id,
-           .data$division_number,
-           .data$division_date,
-           .data$division_title,
-           .data$division_lobby,
-           .data$mnis_id,
-           .data$given_name,
-           .data$family_name,
-           .data$display_name,
-           .data$gender)
+            .data$aye_count,
+            .data$no_count)
 }
 
 #' Fetch key details on Commons divisions votes
 #'
-#' \code{fetch_cds_votes} fetches data from the Commons Votes API
+#' \code{fetch_commons_divisions_votes} fetches data from the Commons Votes API
 #' showing key details about each division vote, with one row per division
-#' vote. All votes or abstentions are returned.
+#' vote.
 #'
 #' @param division_id An integer or vector of integers representing a division
 #' ID.
-#' @return A tibble of key details of voting for a Commons division , with one row
+#' @return A tibble of key details of voting for a Commons division, with one row
 #' per vote.
 #' @export
 
-fetch_cds_votes <- function(division_id) {
+fetch_commons_divisions_votes <- function(division_id) {
 
     # Fetch
     divisions <- fetch_cds_votes_raw(division_id)
@@ -378,7 +441,6 @@ fetch_cds_votes <- function(division_id) {
         dplyr::mutate(vote_direction = "Aye") %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$vote_direction,
@@ -393,7 +455,6 @@ fetch_cds_votes <- function(division_id) {
         dplyr::mutate(vote_direction = "No") %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$vote_direction,
@@ -401,14 +462,13 @@ fetch_cds_votes <- function(division_id) {
             .data$party,
             .data$member_from)
 
-    # Extract abstain votes
-    abstained <- divisions %>%
-        tidyr::unnest(.data$abstained) %>%
+    # Extract didn't vote
+    no_vote_recorded <- divisions %>%
+        tidyr::unnest(.data$no_votes) %>%
         format_cds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "Abstained") %>%
+        dplyr::mutate(vote_direction = "No vote recorded") %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$vote_direction,
@@ -417,7 +477,7 @@ fetch_cds_votes <- function(division_id) {
             .data$member_from)
 
     # Bind
-    divisions <- dplyr::bind_rows(aye_votes, no_votes, abstained)
+    divisions <- dplyr::bind_rows(aye_votes, no_votes, no_vote_recorded)
 
     # Join
     members <- fetch_mps()
@@ -430,7 +490,6 @@ fetch_cds_votes <- function(division_id) {
             member_constituency = member_from) %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$vote_direction,
@@ -440,31 +499,29 @@ fetch_cds_votes <- function(division_id) {
             .data$display_name,
             .data$gender,
             .data$member_party)
-
 }
 
 #' Fetch key details on Commons divisions votes grouped by party
 #'
-#' \code{fetch_cds_party} fetches data from the Commons Votes API
+#' \code{fetch_commons_divisions_party} fetches data from the Commons Votes API
 #' showing key details about each division vote grouped by party, with one row
-#' per division vote direction. All votes or abstentions are returned.
+#' per division grouped vote. All votes or abstentions are returned.
 #'
 #' @param division_id An integer or vector of integers representing a division
 #' ID.
 #' @return A tibble of key details of voting grouped by party for a Commons
-#' division, with one row per vote direction.
+#' division, with one row per grouped vote.
 #' @export
 
-fetch_cds_party <- function(division_id) {
+fetch_commons_divisions_party <- function(division_id) {
 
     # Fetch
-    divisions <- fetch_cds_votes(division_id)
+    divisions <- fetch_commons_divisions_votes(division_id)
 
     # Return
     divisions %>%
         dplyr::group_by(
             division_id,
-            division_number,
             division_date,
             division_title,
             member_party) %>%
@@ -476,12 +533,12 @@ fetch_cds_party <- function(division_id) {
             member_party)
 }
 
-#' Fetch key details MPs voting record for divisions
+#' Fetch key details for an MP's divisions voting record
 #'
-#' \code{fetch_cds_members} fetches data from the Commons Votes API
-#' showing key details about the voting record for an MP for each division,
-#' with one row per division. Only whether an MP voted "Aye" in a division
-#' is returned.
+#' \code{fetch_commons_divisions_members} fetches data from the Commons
+#' Votes API showing key details about the voting record for an MP for each
+#' division, with one row per division. Only whether an MP voted "Aye" in a
+#' division is returned.
 #'
 #' The from_date and to_date arguments can be used to filter divisions based
 #' on the dates they occurred. The on_date argument is a convenience that sets
@@ -502,11 +559,11 @@ fetch_cds_party <- function(division_id) {
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
 #'   default value is NA, which means no records are excluded on the basis of
 #'   the on_date.
-#' @return A tibble of key details for each Commons deferred division, with one row
-#' per deferred division.
+#' @return A tibble of key details for an MP's voting record, with one row
+#' per division.
 #' @export
 
-fetch_cds_members <- function(
+fetch_commons_divisions_members <- function(
     member_mnis_id,
     from_date = NA,
     to_date = NA,
@@ -527,7 +584,6 @@ fetch_cds_members <- function(
     divisions %>%
         dplyr::select(
             .data$division_id,
-            .data$division_number,
             .data$division_date,
             .data$division_title,
             .data$mnis_id,

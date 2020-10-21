@@ -1,4 +1,6 @@
-### Request functions for fetching and processing data
+### Functions for requesting API data and processing pagination
+
+# Request ---------------------------------------------------------------------
 
 #' Send a request to API and return the response as a named list
 #'
@@ -27,20 +29,17 @@ request <- function(url, tibble = FALSE) {
     }
 }
 
-
-
-
-### Utility functions
+# Process: Commons ------------------------------------------------------------
 
 #' Processes hidden pagination of results retrieved from the API
 #'
 #' @param url The full API URL specifying the endpoint and request parameters.
 #' @keywords internal
 
-process_pagination <- function(url) {
+process_cds_pagination <- function(url) {
 
     # Get number of divisions
-    total_divisions <- request(stringr::str_glue("{API_TOTAL}"))
+    total_divisions <- request(stringr::str_glue("{API_COMMONS_TOTAL}"))
 
     # Skip amount
     skip_amount <- seq(0, total_divisions, by = 25)
@@ -51,14 +50,17 @@ process_pagination <- function(url) {
             stringr::str_glue("{url}?queryParameters.skip={amount}"),
             tibble = TRUE)
     })
-
 }
 
+#' Process hidden pagination of Member results from the API
+#'
+#' @param url The full API URL specifying the endpoint and request parameters.
+#' @keyword internal
 
-process_pagination_member <- function(url, member_mnis_id) {
+process_cds_pagination_member <- function(url, member_mnis_id) {
 
     # Get number of divisions
-    total_divisions <- request(stringr::str_glue("{API_TOTAL}"))
+    total_divisions <- request(stringr::str_glue("{API_COMMONS_TOTAL}"))
 
     # Skip amount
     skip_amount <- seq(0, total_divisions, by = 25)
@@ -69,7 +71,48 @@ process_pagination_member <- function(url, member_mnis_id) {
             stringr::str_glue("{url}?queryParameters.memberId={member_mnis_id}&queryParameters.skip={amount}"),
             tibble = TRUE)
     })
-
-
 }
 
+# Process: Lords --------------------------------------------------------------
+
+#' Processes hidden pagination of results retrieved from the API
+#'
+#' @param url The full API URL specifying the endpoint and request parameters.
+#' @keywords internal
+
+process_lds_pagination <- function(url) {
+
+    # Get number of divisions
+    total_divisions <- request(stringr::str_glue("{API_LORDS_TOTAL}"))
+
+    # Skip amount
+    skip_amount <- seq(0, total_divisions, by = 500)
+
+    # Map pagination
+    purrr::map_df(skip_amount, function(amount) {
+        request(
+            stringr::str_glue("{url}?skip={amount}&take=500"),
+            tibble = TRUE)
+    })
+}
+
+#' Process hidden pagination of Member results from the API
+#'
+#' @param url The full API URL specifying the endpoint and request parameters.
+#' @keyword internal
+
+process_lds_pagination_member <- function(url, member_mnis_id) {
+
+    # Get number of divisions
+    total_divisions <- request(stringr::str_glue("{API_LORDS_TOTAL}"))
+
+    # Skip amount
+    skip_amount <- seq(0, total_divisions, by = 500)
+
+    # Map pagination
+    purrr::map_df(skip_amount, function(amount) {
+        request(
+            stringr::str_glue("{url}?MemberId={member_mnis_id}&skip={amount}&take=500"),
+            tibble = TRUE)
+    })
+}

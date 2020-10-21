@@ -1,2 +1,3 @@
-^.*\.Rproj$
+^clcommittees\.Rproj$
 ^\.Rproj\.user$
+^readme\.md$
