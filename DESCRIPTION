@@ -26,5 +26,4 @@ Imports:
     janitor,
     tidyr
 Remotes: houseofcommonslibrary/clmnis
-
-    
+RoxygenNote: 7.1.1
