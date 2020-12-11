@@ -18,8 +18,9 @@ format_cds_raw <- function(df) {
     # As character
     df <- df %>% dplyr::mutate(
         dplyr::across(
-            division_id,
-        as.character))
+            c(division_id,
+              number),
+            as.character))
 
     # As date
     df <- df %>% dplyr::mutate(
@@ -134,7 +135,9 @@ format_lds_raw <- function(df) {
     # As character
     df <- df %>% dplyr::mutate(
         dplyr::across(
-            division_id,
+            c(division_id,
+              number,
+              sponsoring_member_id),
             as.character))
 
     # As date

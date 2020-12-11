@@ -39,9 +39,9 @@ fetch_lds_votes_raw <- function(division_id) {
 
 fetch_lds_members_raw <- function(
     member_mnis_id,
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     member_ids <- member_mnis_id
     divisions <- purrr::map_df(member_ids, function(id) {
@@ -70,12 +70,12 @@ fetch_lds_members_raw <- function(
 #' @keywords internal
 
 fetch_lds_raw_filter <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Set from_date and to_date to on_date if set
-    if (!is.na(on_date)) {
+    if (!is.null(on_date)) {
         from_date <- on_date
         to_date <- on_date
     }
@@ -88,7 +88,7 @@ fetch_lds_raw_filter <- function(
     }
 
     # Filter on dates if requested
-    if (!is.na(from_date) || !is.na(to_date)) {
+    if (!is.null(from_date) || !is.null(to_date)) {
         divisions <- filter_dates(
             divisions,
             start_col = "division_date",
@@ -115,24 +115,24 @@ fetch_lds_raw_filter <- function(
 #'
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details for each Lords division, with one row
 #' per division.
 #' @export
 
 fetch_lords_divisions_all <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Fetch / filter raw data
     divisions <- fetch_lds_raw_filter(
@@ -165,24 +165,24 @@ fetch_lords_divisions_all <- function(
 #'
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details of tellers for each Lords division, with one row
 #' per teller.
 #' @export
 
 fetch_lords_divisions_tellers <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Fetch / filter raw data
     divisions <- fetch_lds_raw_filter(
@@ -190,7 +190,7 @@ fetch_lords_divisions_tellers <- function(
         to_date,
         on_date)
 
-    tryCatch({
+    divisions <- tryCatch({
 
         # Extract tellers and bind rows
         content_tellers <- divisions %>%
@@ -224,10 +224,10 @@ fetch_lords_divisions_tellers <- function(
             dplyr::rename(
                 mnis_id = member_id,
                 member_party = party)
-        divisions$mnis_id %<>% as.character()
+        divisions$mnis_id <- as.character(divisions$mnis_id)
 
         # Join
-        members <- fetch_lords()
+        members <- clmnis::fetch_lords()
         divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
 
         # Return
@@ -256,6 +256,8 @@ fetch_lords_divisions_tellers <- function(
                 gender = as.character(NA))
         }
     )
+    # Return
+    divisions
 }
 
 #' Fetch key details on all Lords remote divisions
@@ -271,24 +273,24 @@ fetch_lords_divisions_tellers <- function(
 #'
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details of remote Lords divisions, with one row
 #' per remote division.
 #' @export
 
 fetch_lords_divisions_remote <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Fetch / filter raw data
     divisions <- fetch_lds_raw_filter(
@@ -321,6 +323,9 @@ fetch_lords_divisions_remote <- function(
 #' @export
 
 fetch_lords_divisions_votes <- function(division_id) {
+
+    # Check division ID provided
+    if (is.null(division_id)) stop(missing_argument("division_id"))
 
     # Fetch
     divisions <- fetch_lds_votes_raw(division_id)
@@ -390,6 +395,9 @@ fetch_lords_divisions_votes <- function(division_id) {
 
 fetch_lords_divisions_party <- function(division_id) {
 
+    # Check division ID provided
+    if (is.null(division_id)) stop(missing_argument("division_id"))
+
     # Fetch
     divisions <- fetch_lords_divisions_votes(division_id)
 
@@ -424,25 +432,31 @@ fetch_lords_divisions_party <- function(division_id) {
 #'   mnis ID.
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details for a Lords voting record, with one row
 #' per division.
 #' @export
 
 fetch_lords_divisions_members <- function(
-    member_mnis_id,
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    member_mnis_id = NULL,
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
+
+    # Check member mnis ID provided
+    if (is.null(member_mnis_id)) stop(missing_argument("member_mnis_id"))
+
+    # Check member mnis ID is valid
+    check_mnis_id(member_mnis_id, "lords")
 
     # Fetch
     divisions <- fetch_lds_members_raw(
@@ -452,7 +466,7 @@ fetch_lords_divisions_members <- function(
         on_date)
 
     # Join
-    members <- fetch_lords()
+    members <- clmnis::fetch_lords()
     divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
 
     # Return

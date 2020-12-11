@@ -18,3 +18,59 @@ request_error <- function(response) {
 missing_column_error <- function(colname) {
     stringr::str_glue("Could not find a column called {colname}")
 }
+
+#' Report a missing division_id argument
+#'
+#' @param argument The name of the missing argument.
+#' @keyword internal
+
+missing_argument <- function(argument) {
+    stringr::str_glue("A {argument} has not been supplied.")
+}
+
+#' Report invalid mnis id
+#'
+#' @keywords internal
+
+invalid_mnis_id <- function(member_mnis_id) {
+    stringr::str_glue("The member_mnis_id provided is not associated with ",
+    "any Members.")
+}
+
+#' Check mnis id
+#'
+#' @param member_mnis_id The mnis id of a member to check.
+#' @param house Commons or Lords
+#' @keywords internal
+
+check_mnis_id <- function(member_mnis_id, house) {
+
+    if (house == "commons") {
+        members <- clmnis::fetch_mps()
+        members <- unique(members$mnis_id)
+
+        if (! member_mnis_id %in% members) {
+            stop(invalid_mnis_id(member_mnis_id))
+        }
+    }
+
+    if (house == "lords") {
+        members <- clmnis::fetch_lords()
+        members <- unique(members$mnis_id)
+
+        if (! memnber_mnis_id %in% members) {
+            stop(invalid_mnis_id(member_mnis_id))
+        }
+    }
+}
+
+#' Report an error parsing a date string
+#'
+#' @param date_str The date string that could not be parsed.
+#' @keywords internal
+
+date_format_error <- function(date_str) {
+    stringr::str_glue(stringr::str_c(
+        "{date_str} is not a valid Date or ",
+        "date string: use format \"YYYY-MM-DD\""))
+}

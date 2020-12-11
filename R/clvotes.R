@@ -8,6 +8,7 @@
 #' @name clvotes
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @importFrom data.table :=
 NULL
 
 # Tell R CMD check about new operators

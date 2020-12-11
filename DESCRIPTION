@@ -27,3 +27,5 @@ Imports:
     tidyr
 Remotes: houseofcommonslibrary/clmnis
 RoxygenNote: 7.1.1
+Suggests: 
+    testthat

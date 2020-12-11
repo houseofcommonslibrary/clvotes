@@ -16,24 +16,24 @@
 #'
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details for each Commons division, with one row
 #' per division in raw format.
 #' @export
 
 fetch_commons_divisions_all_raw <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Fetch / filter raw data
     divisions <- fetch_cds_raw_filter(
@@ -61,24 +61,24 @@ fetch_commons_divisions_all_raw <- function(
 #'
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the to_date.
 #' @param on_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the on_date.
 #' @return A tibble of key details for each Lords division, with one row
 #' per division in raw format.
 #' @export
 
 fetch_lords_divisions_all_raw <- function(
-    from_date = NA,
-    to_date = NA,
-    on_date = NA) {
+    from_date = NULL,
+    to_date = NULL,
+    on_date = NULL) {
 
     # Fetch / filter raw data
     divisions <- fetch_lds_raw_filter(

@@ -18,11 +18,11 @@
 #'   activity.
 #' @param from_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis of
+#'   default value is NULL, which means no records are excluded on the basis of
 #'   the from_date.
 #' @param to_date A string or Date representing a date. If a string is used
 #'   it should specify the date in ISO 8601 date format e.g. 2000-12-31'. The
-#'   default value is NA, which means no records are excluded on the basis
+#'   default value is NULL, which means no records are excluded on the basis
 #'   of the to_date.
 #' @return  A tibble with the same structure as the input df containing
 #'   the rows that meet the filtering criteria.
@@ -32,8 +32,8 @@ filter_dates <- function(
     df,
     start_col,
     end_col,
-    from_date = NA,
-    to_date = NA) {
+    from_date = NULL,
+    to_date = NULL) {
 
     # Check the start and end columns exist
     if (! start_col %in% colnames(df)) {
@@ -48,14 +48,14 @@ filter_dates <- function(
     if (nrow(df) == 0) return(df)
 
     # Check there are dates to filter
-    if (is.na(from_date) && is.na(to_date)) return(df)
+    if (is.null(from_date) && is.null(to_date)) return(df)
 
     # Handle from and to dates
     from_date <- handle_date(from_date)
     to_date <- handle_date(to_date)
 
     # Check from date is before to date
-    if ((!is.na(from_date)) && (!is.na(to_date)) && (from_date > to_date)) {
+    if ((!is.null(from_date)) && (!is.null(to_date)) && (from_date > to_date)) {
         stop("to_date is before from_date")
     }
 
@@ -64,15 +64,15 @@ filter_dates <- function(
     to_before_start <- FALSE
 
     # Get matching rows
-    if (!is.na(from_date)) {
+    if (!is.null(from_date)) {
         from_after_end <- purrr::map_lgl(df[[end_col]], function(d) {
-            ifelse(is.na(d), FALSE, from_date > d)
+            ifelse(is.null(d), FALSE, from_date > d)
         })
     }
 
-    if (!is.na(to_date)) {
+    if (!is.null(to_date)) {
         to_before_start <- purrr::map_lgl(df[[start_col]], function(d) {
-            ifelse(is.na(d), FALSE, to_date < d)
+            ifelse(is.null(d), FALSE, to_date < d)
         })
     }
 
@@ -82,14 +82,14 @@ filter_dates <- function(
 #' Take a date which may be a string or a date and returns a date.
 #'
 #' \code{handle_date} takes a date which may be a Date or an ISO 8601 date
-#' string, checks it is valid, and returns the date as a Date. NA values are
+#' string, checks it is valid, and returns the date as a Date. NULL values are
 #' returned unmodified. This function raises an error if it is unable to
 #' handle the date.
 #'
 #' @keywords internal
 
 handle_date <- function(d) {
-    if (is.na(d)) {
+    if (is.null(d)) {
         return(d)
     } else if (class(d) == "Date") {
         return(d)
