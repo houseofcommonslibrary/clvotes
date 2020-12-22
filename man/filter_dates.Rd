@@ -4,7 +4,7 @@
 \alias{filter_dates}
 \title{Filter a tibble of data based on the given from and to dates.}
 \usage{
-filter_dates(df, start_col, end_col, from_date = NA, to_date = NA)
+filter_dates(df, start_col, end_col, from_date = NULL, to_date = NULL)
 }
 \arguments{
 \item{df}{A tibble containing data on a time bound activity.}
@@ -17,12 +17,12 @@ activity.}
 
 \item{from_date}{A string or Date representing a date. If a string is used
 it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-default value is NA, which means no records are excluded on the basis of
+default value is NULL, which means no records are excluded on the basis of
 the from_date.}
 
 \item{to_date}{A string or Date representing a date. If a string is used
 it should specify the date in ISO 8601 date format e.g. 2000-12-31'. The
-default value is NA, which means no records are excluded on the basis
+default value is NULL, which means no records are excluded on the basis
 of the to_date.}
 }
 \value{

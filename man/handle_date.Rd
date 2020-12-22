@@ -8,7 +8,7 @@ handle_date(d)
 }
 \description{
 \code{handle_date} takes a date which may be a Date or an ISO 8601 date
-string, checks it is valid, and returns the date as a Date. NA values are
+string, checks it is valid, and returns the date as a Date. NULL values are
 returned unmodified. This function raises an error if it is unable to
 handle the date.
 }

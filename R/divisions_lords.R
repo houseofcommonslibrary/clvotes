@@ -49,10 +49,11 @@ fetch_lds_members_raw <- function(
             stringr::str_glue("{API_LORDS_GENERAL}membervoting"),
             id)
     })
+
     divisions <- format_lds_members_raw(divisions)
 
     # Filter on dates if requested
-    if (!is.na(from_date) || !is.na(to_date)) {
+    if (!is.null(from_date) || !is.null(to_date)) {
         divisions <- filter_dates(
             divisions,
             start_col = "division_date",

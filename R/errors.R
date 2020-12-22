@@ -58,7 +58,7 @@ check_mnis_id <- function(member_mnis_id, house) {
         members <- clmnis::fetch_lords()
         members <- unique(members$mnis_id)
 
-        if (! memnber_mnis_id %in% members) {
+        if (! member_mnis_id %in% members) {
             stop(invalid_mnis_id(member_mnis_id))
         }
     }

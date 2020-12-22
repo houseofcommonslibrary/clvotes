@@ -90,7 +90,7 @@ This dataframe contains summary details for a division, such as the division dat
 --- 
 
 ```r
-clvotes::fetch_commons_divisions_members(division_id, from_date = NA, to_date = NA, on_date = NA)
+clvotes::fetch_commons_divisions_members(member_mnis_id, from_date = NA, to_date = NA, on_date = NA)
 ```
 
 Fetch a dataframe of key details about the division voting record of an MP, with one row per division.
@@ -155,7 +155,7 @@ This dataframe contains summary details for a division, such as the division dat
 --- 
 
 ```r
-clvotes::fetch_lords_divisions_members(division_id, from_date = NA, to_date = NA, on_date = NA)
+clvotes::fetch_lords_divisions_members(member_mnis_id, from_date = NA, to_date = NA, on_date = NA)
 ```
 
 Fetch a dataframe of key details about the division voting record of aLord, with one row per division.

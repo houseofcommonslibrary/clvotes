@@ -4,7 +4,7 @@
 \alias{fetch_commons_divisions_votes}
 \title{Fetch key details on Commons divisions votes}
 \usage{
-fetch_commons_divisions_votes(division_id)
+fetch_commons_divisions_votes(division_id = NULL)
 }
 \arguments{
 \item{division_id}{An integer or vector of integers representing a division

@@ -471,7 +471,7 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
 
     # Extract didn't vote
     no_vote_recorded <- divisions %>%
-        tidyr::unnest(.data$no_votes) %>%
+        tidyr::unnest(.data$no_vote_recorded) %>%
         format_cds_votes_raw() %>%
         dplyr::mutate(vote_direction = "No vote recorded") %>%
         dplyr::select(

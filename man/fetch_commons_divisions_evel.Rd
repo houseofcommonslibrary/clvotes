@@ -4,22 +4,22 @@
 \alias{fetch_commons_divisions_evel}
 \title{Fetch key details on all Commons EVEL divisions}
 \usage{
-fetch_commons_divisions_evel(from_date = NA, to_date = NA, on_date = NA)
+fetch_commons_divisions_evel(from_date = NULL, to_date = NULL, on_date = NULL)
 }
 \arguments{
 \item{from_date}{A string or Date representing a date. If a string is used
 it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-default value is NA, which means no records are excluded on the basis of
+default value is NULL, which means no records are excluded on the basis of
 the from_date.}
 
 \item{to_date}{A string or Date representing a date. If a string is used
 it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-default value is NA, which means no records are excluded on the basis of
+default value is NULL, which means no records are excluded on the basis of
 the to_date.}
 
 \item{on_date}{A string or Date representing a date. If a string is used
 it should specify the date in ISO 8601 date format e.g. '2000-12-31'. The
-default value is NA, which means no records are excluded on the basis of
+default value is NULL, which means no records are excluded on the basis of
 the on_date.}
 }
 \value{

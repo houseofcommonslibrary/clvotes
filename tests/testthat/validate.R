@@ -4,7 +4,19 @@
 
 READ_TEST_DATA_DIR <- file.path("data")
 WRITE_TEST_DATA_DIR <- file.path("tests", "testthat", "data")
-TEST_DATE <- "2017-02-08"
+API_PAUSE_TIME <- 1
+
+# Commons
+COMMONS_TEST_DATE <- "2017-02-08"
+COMMONS_DIVISION_ID <- 219
+COMMONS_MEMBER_ID <- 172
+# COMMONS_DIVISIONS <- stringr::str_glue("{API_COMMONS_GENERAL}search")
+
+# Lords
+LORDS_TEST_DATE <- "2017-03-20"
+LORDS_DIVISION_ID <- 2085
+LORDS_MEMBER_ID <- 3743
+
 
 # Read and write data ---------------------------------------------------------
 

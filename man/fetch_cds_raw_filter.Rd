@@ -4,7 +4,7 @@
 \alias{fetch_cds_raw_filter}
 \title{Filter data on all Commons divisions}
 \usage{
-fetch_cds_raw_filter(from_date = NA, to_date = NA, on_date = NA)
+fetch_cds_raw_filter(from_date = NULL, to_date = NULL, on_date = NULL)
 }
 \description{
 Filter data on all Commons divisions

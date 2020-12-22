@@ -1,4 +1,3 @@
-^.*\.Rproj$
+^clvotes\.Rproj$
 ^\.Rproj\.user$
-^readme.md
-^docs
+^readme\.md$

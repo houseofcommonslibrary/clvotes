@@ -14,4 +14,3 @@ API_LORDS_TOTAL <- "https://lordsvotes-api.parliament.uk/data/Divisions/searchTo
 cache <- new.env(parent = emptyenv())
 CACHE_CDS_RAW <- "cds_raw"
 CACHE_LDS_RAW <- "lds_raw"
-

@@ -6,9 +6,9 @@
 \usage{
 fetch_cds_members_raw(
   member_mnis_id,
-  from_date = NA,
-  to_date = NA,
-  on_date = NA
+  from_date = NULL,
+  to_date = NULL,
+  on_date = NULL
 )
 }
 \description{
