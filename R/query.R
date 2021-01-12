@@ -55,7 +55,7 @@ process_cds_pagination <- function(url) {
 #' Process hidden pagination of Member results from the API
 #'
 #' @param url The full API URL specifying the endpoint and request parameters.
-#' @keyword internal
+#' @keywords internal
 
 process_cds_pagination_member <- function(url, member_mnis_id) {
 
@@ -99,7 +99,7 @@ process_lds_pagination <- function(url) {
 #' Process hidden pagination of Member results from the API
 #'
 #' @param url The full API URL specifying the endpoint and request parameters.
-#' @keyword internal
+#' @keywords internal
 
 process_lds_pagination_member <- function(url, member_mnis_id) {
 

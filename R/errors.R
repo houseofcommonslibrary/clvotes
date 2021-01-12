@@ -22,7 +22,7 @@ missing_column_error <- function(colname) {
 #' Report a missing division_id argument
 #'
 #' @param argument The name of the missing argument.
-#' @keyword internal
+#' @keywords internal
 
 missing_argument <- function(argument) {
     stringr::str_glue("A {argument} has not been supplied.")
@@ -35,33 +35,6 @@ missing_argument <- function(argument) {
 invalid_mnis_id <- function(member_mnis_id) {
     stringr::str_glue("The member_mnis_id provided is not associated with ",
     "any Members.")
-}
-
-#' Check mnis id
-#'
-#' @param member_mnis_id The mnis id of a member to check.
-#' @param house Commons or Lords
-#' @keywords internal
-
-check_mnis_id <- function(member_mnis_id, house) {
-
-    if (house == "commons") {
-        members <- clmnis::fetch_mps()
-        members <- unique(members$mnis_id)
-
-        if (! member_mnis_id %in% members) {
-            stop(invalid_mnis_id(member_mnis_id))
-        }
-    }
-
-    if (house == "lords") {
-        members <- clmnis::fetch_lords()
-        members <- unique(members$mnis_id)
-
-        if (! member_mnis_id %in% members) {
-            stop(invalid_mnis_id(member_mnis_id))
-        }
-    }
 }
 
 #' Report an error parsing a date string

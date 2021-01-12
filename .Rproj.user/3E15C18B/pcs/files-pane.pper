@@ -9,5 +9,5 @@
             "ascending": true
         }
     ],
-    "path": "~/Code/r/packages/clvotes"
+    "path": "~/Code/r/packages/clvotes/tests/testthat"
 }

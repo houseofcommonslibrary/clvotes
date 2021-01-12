@@ -61,10 +61,9 @@ test_that("fetch_lords_divisions_tellers processes results correctly.", {
                     "division_title",
                     "division_lobby",
                     "mnis_id",
-                    "given_name",
-                    "family_name",
-                    "display_name",
-                    "gender")
+                    "member_name",
+                    "member_party",
+                    "member_lord_type")
 
                 obs <- fetch_lords_divisions_tellers()
                 exp <- read("fetch_lords_divisions_tellers")
@@ -111,11 +110,9 @@ test_that("fetch_lords_divisions_votes processes results correctly.", {
                     "division_title",
                     "vote_direction",
                     "mnis_id",
-                    "given_name",
-                    "family_name",
-                    "display_name",
-                    "gender",
-                    "member_party")
+                    "member_name",
+                    "member_party",
+                    "member_lord_type")
 
                 obs <- fetch_lords_divisions_votes(LORDS_DIVISION_ID)
                 exp <- read("fetch_lords_divisions_votes")
@@ -142,6 +139,25 @@ test_that("fetch_lords_divisions_party processes results correctly.", {
             })
 })
 
+test_that("fetch_lords_divisions_lord_type processes results correctly.", {
+    with_mock(
+        "clvotes::request" = mock_request(
+            mock_fetch_lords_votes), {
+
+                cols <- c(
+                    "division_id",
+                    "division_date",
+                    "division_title",
+                    "member_lord_type",
+                    "vote_direction",
+                    "vote_count")
+
+                obs <- fetch_lords_divisions_lord_type(LORDS_DIVISION_ID)
+                exp <- read("fetch_lords_divisions_lord_type")
+                compare_obs_exp(obs, exp, cols, "division_id")
+            })
+})
+
 test_that("fetch_lords_divisions_members processes results correctly.", {
     with_mock(
         "clvotes::process_cds_pagination_member" = mock_process_lds_pagination_member(
@@ -152,10 +168,6 @@ test_that("fetch_lords_divisions_members processes results correctly.", {
                     "division_date",
                     "division_title",
                     "mnis_id",
-                    "given_name",
-                    "family_name",
-                    "display_name",
-                    "gender",
                     "member_was_content",
                     "member_was_teller")
 

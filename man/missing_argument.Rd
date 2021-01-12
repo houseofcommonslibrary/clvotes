@@ -12,3 +12,4 @@ missing_argument(argument)
 \description{
 Report a missing division_id argument
 }
+\keyword{internal}

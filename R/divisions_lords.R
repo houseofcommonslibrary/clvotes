@@ -50,7 +50,17 @@ fetch_lds_members_raw <- function(
             id)
     })
 
+    if (nrow(divisions) == 0 & ncol(divisions) == 0) {
+        return(divisions)
+    }
+
     divisions <- format_lds_members_raw(divisions)
+
+    # Set from_date and to_date to on_date if set
+    if (!is.null(on_date)) {
+        from_date <- on_date
+        to_date <- on_date
+    }
 
     # Filter on dates if requested
     if (!is.null(from_date) || !is.null(to_date)) {
@@ -204,7 +214,9 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$member_id,
-                .data$party)
+                .data$name,
+                .data$party,
+                .data$member_from)
 
         not_content_tellers <- divisions %>%
             tidyr::unnest(.data$not_content_tellers) %>%
@@ -217,19 +229,19 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$member_id,
-                .data$party)
+                .data$name,
+                .data$party,
+                .data$member_from)
 
         # Bind
         divisions <- dplyr::bind_rows(content_tellers, not_content_tellers)
         divisions <- divisions %>%
             dplyr::rename(
                 mnis_id = member_id,
-                member_party = party)
+                member_name = name,
+                member_party = party,
+                member_lord_type = member_from)
         divisions$mnis_id <- as.character(divisions$mnis_id)
-
-        # Join
-        members <- clmnis::fetch_lords()
-        divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
 
         # Return
         divisions %>%
@@ -239,10 +251,9 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$mnis_id,
-                .data$given_name,
-                .data$family_name,
-                .data$display_name,
-                .data$gender)
+                .data$member_name,
+                .data$member_party,
+                .data$member_lord_type)
         },
         error = function(c) {
             tibble::tibble(
@@ -251,10 +262,9 @@ fetch_lords_divisions_tellers <- function(
                 division_title = as.character(NA),
                 division_lobby = as.character(NA),
                 mnis_id = as.character(NA),
-                given_name = as.character(NA),
-                family_name = as.character(NA),
-                display_name = as.character(NA),
-                gender = as.character(NA))
+                member_name = as.character(NA),
+                member_party = as.character(NA),
+                member_lord_type = as.character(NA))
         }
     )
     # Return
@@ -331,55 +341,73 @@ fetch_lords_divisions_votes <- function(division_id) {
     # Fetch
     divisions <- fetch_lds_votes_raw(division_id)
 
-    # Extract content votes
-    content_votes <- divisions %>%
-        tidyr::unnest(.data$content_votes) %>%
-        format_lds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "Content") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$party)
+    divisions <- tryCatch({
 
-    # Extract not content votes
-    not_content_votes <- divisions %>%
-        tidyr::unnest(.data$not_content_votes) %>%
-        format_lds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "Not content") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$party)
+        # Extract content votes
+        content_votes <- divisions %>%
+            tidyr::unnest(.data$content_votes) %>%
+            format_lds_votes_raw() %>%
+            dplyr::mutate(vote_direction = "Content") %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$name,
+                .data$party,
+                .data$member_from)
 
-    # Bind
-    divisions <- dplyr::bind_rows(content_votes, not_content_votes)
+        # Extract not content votes
+        not_content_votes <- divisions %>%
+            tidyr::unnest(.data$not_content_votes) %>%
+            format_lds_votes_raw() %>%
+            dplyr::mutate(vote_direction = "Not content") %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$name,
+                .data$party,
+                .data$member_from)
 
-    # Join
-    members <- clmnis::fetch_lords()
-    divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
+        # Bind
+        divisions <- dplyr::bind_rows(content_votes, not_content_votes)
+
+        # Return
+        divisions %>%
+            dplyr::rename(
+                mnis_id = mnis_id,
+                member_name = name,
+                member_party = party,
+                member_lord_type = member_from) %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$member_name,
+                .data$member_party,
+                .data$member_lord_type)
+        },
+        error = function(c) {
+            tibble::tibble(
+                division_id = as.character(NA),
+                division_date = as.Date(NA),
+                division_title = as.character(NA),
+                vote_direction = as.character(NA),
+                mnis_id = as.character(NA),
+                member_name = as.character(NA),
+                member_party = as.character(NA),
+                member_lord_type = as.character(NA))
+        }
+    )
 
     # Return
-    divisions %>%
-        dplyr::rename(
-            member_party = party) %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$given_name,
-            .data$family_name,
-            .data$display_name,
-            .data$gender,
-            .data$member_party)
-
+    divisions
 }
 
 #' Fetch key details on Lords divisions votes grouped by party
@@ -416,6 +444,42 @@ fetch_lords_divisions_party <- function(division_id) {
             vote_direction,
             member_party)
 }
+
+#' Fetch key details on Lords divisions votes grouped by lord type
+#'
+#' \code{fetch_lords_divisions_lord_type} fetches data from the Lords Votes API
+#' showing key details about each division vote grouped by lord type, with one
+#' row per division grouped vote.
+#'
+#' @param division_id An integer or vector of integers representing a division
+#' ID.
+#' @return A tibble of key details of voting grouped by lord type for a Lords
+#' division, with one row per grouped vote.
+#' @export
+
+fetch_lords_divisions_lord_type <- function(division_id) {
+
+    # Check division ID provided
+    if (is.null(division_id)) stop(missing_argument("division_id"))
+
+    # Fetch
+    divisions <- fetch_lords_divisions_votes(division_id)
+
+    # Return
+    divisions %>%
+        dplyr::group_by(
+            division_id,
+            division_date,
+            division_title,
+            member_lord_type) %>%
+        dplyr::count(vote_direction) %>%
+        dplyr::rename(vote_count = n) %>%
+        dplyr::arrange(
+            division_id,
+            vote_direction,
+            member_lord_type)
+}
+
 
 #' Fetch key details Lords voting record for divisions
 #'
@@ -456,9 +520,6 @@ fetch_lords_divisions_members <- function(
     # Check member mnis ID provided
     if (is.null(member_mnis_id)) stop(missing_argument("member_mnis_id"))
 
-    # Check member mnis ID is valid
-    check_mnis_id(member_mnis_id, "lords")
-
     # Fetch
     divisions <- fetch_lds_members_raw(
         member_mnis_id,
@@ -466,21 +527,31 @@ fetch_lords_divisions_members <- function(
         to_date,
         on_date)
 
-    # Join
-    members <- clmnis::fetch_lords()
-    divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
+    if (nrow(divisions) == 0 & ncol(divisions) == 0) stop(invalid_mnis_id(member_mnis_id))
+
+    divisions <- tryCatch({
+
+        # Return
+        divisions %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$mnis_id,
+                .data$member_was_content,
+                .data$member_was_teller)
+        },
+        error = function(c) {
+            tibble::tibble(
+                division_id = as.character(NA),
+                division_date = as.Date(NA),
+                division_title = as.character(NA),
+                mnis_id = as.character(NA),
+                member_was_content = as.character(NA),
+                member_was_teller = as.character(NA))
+        }
+    )
 
     # Return
-    divisions %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$mnis_id,
-            .data$given_name,
-            .data$family_name,
-            .data$display_name,
-            .data$gender,
-            .data$member_was_content,
-            .data$member_was_teller)
+    divisions
 }

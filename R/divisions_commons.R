@@ -51,7 +51,17 @@ fetch_cds_members_raw <- function(
             id)
     })
 
+    if (nrow(divisions) == 0 & ncol(divisions) == 0) {
+        return(divisions)
+    }
+
     divisions <- format_cds_members_raw(divisions)
+
+    # Set from_date and to_date to on_date if set
+    if (!is.null(on_date)) {
+        from_date <- on_date
+        to_date <- on_date
+    }
 
     # Filter on dates if requested
     if (!is.null(from_date) || !is.null(to_date)) {
@@ -310,6 +320,7 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$member_id,
+                .data$name,
                 .data$party,
                 .data$member_from)
 
@@ -324,6 +335,7 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$member_id,
+                .data$name,
                 .data$party,
                 .data$member_from)
 
@@ -332,13 +344,10 @@ fetch_commons_divisions_tellers <- function(
         divisions <- divisions %>%
             dplyr::rename(
                 mnis_id = member_id,
+                member_name = name,
                 member_party = party,
                 member_constituency = member_from)
         divisions$mnis_id <- as.character(divisions$mnis_id)
-
-        # Join
-        members <- clmnis::fetch_mps()
-        divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
 
         # Return
         divisions %>%
@@ -348,10 +357,9 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_title,
                 .data$division_lobby,
                 .data$mnis_id,
-                .data$given_name,
-                .data$family_name,
-                .data$display_name,
-                .data$gender)
+                .data$member_name,
+                .data$member_party,
+                .data$member_constituency)
         },
         error = function(c) {
             tibble::tibble(
@@ -360,10 +368,9 @@ fetch_commons_divisions_tellers <- function(
                 division_title = as.character(NA),
                 division_lobby = as.character(NA),
                 mnis_id = as.character(NA),
-                given_name = as.character(NA),
-                family_name = as.character(NA),
-                display_name = as.character(NA),
-                gender = as.character(NA))
+                member_name = as.character(NA),
+                member_party = as.character(NA),
+                member_constituency = as.character(NA))
         }
     )
 
@@ -441,71 +448,95 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
     # Fetch
     divisions <- fetch_cds_votes_raw(division_id)
 
-    # Extract aye votes
-    aye_votes <- divisions %>%
-        tidyr::unnest(.data$aye_votes) %>%
-        format_cds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "Aye") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$party,
-            .data$member_from)
+    divisions <- tryCatch({
 
-    # Extract no votes
-    no_votes <- divisions %>%
-        tidyr::unnest(.data$no_votes) %>%
-        format_cds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "No") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$party,
-            .data$member_from)
+        # Extract aye votes
+        aye_votes <- divisions %>%
+            tidyr::unnest(.data$aye_votes) %>%
+            format_cds_votes_raw() %>%
+            dplyr::mutate(vote_direction = "Aye") %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$name,
+                .data$party,
+                .data$member_from,
+                .data$proxy_name)
 
-    # Extract didn't vote
-    no_vote_recorded <- divisions %>%
-        tidyr::unnest(.data$no_vote_recorded) %>%
-        format_cds_votes_raw() %>%
-        dplyr::mutate(vote_direction = "No vote recorded") %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$party,
-            .data$member_from)
+        # Extract no votes
+        no_votes <- divisions %>%
+            tidyr::unnest(.data$no_votes) %>%
+            format_cds_votes_raw() %>%
+            dplyr::mutate(vote_direction = "No") %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$name,
+                .data$party,
+                .data$member_from,
+                .data$proxy_name)
 
-    # Bind
-    divisions <- dplyr::bind_rows(aye_votes, no_votes, no_vote_recorded)
+        # Extract didn't vote
+        no_vote_recorded <- divisions %>%
+            tidyr::unnest(.data$no_vote_recorded) %>%
+            format_cds_votes_raw() %>%
+            dplyr::mutate(vote_direction = "No vote recorded") %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$name,
+                .data$party,
+                .data$member_from,
+                .data$proxy_name)
 
-    # Join
-    members <- clmnis::fetch_mps()
-    divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
+        # Bind
+        divisions <- dplyr::bind_rows(aye_votes, no_votes, no_vote_recorded)
+        divisions <- divisions %>%
+            dplyr::rename(
+                member_name = name,
+                member_party = party,
+                member_constituency = member_from,
+                member_proxy_name = proxy_name)
+        divisions$mnis_id <- as.character(divisions$mnis_id)
 
-    # Return
-    divisions %>%
-        dplyr::rename(
-            member_party = party,
-            member_constituency = member_from) %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$vote_direction,
-            .data$mnis_id,
-            .data$given_name,
-            .data$family_name,
-            .data$display_name,
-            .data$gender,
-            .data$member_party)
+        # Return
+        divisions %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$vote_direction,
+                .data$mnis_id,
+                .data$member_name,
+                .data$member_party,
+                .data$member_constituency,
+                .data$member_proxy_name)
+            },
+            error = function(c) {
+                tibble::tibble(
+                division_id = as.character(NA),
+                division_date = as.Date(NA),
+                division_title = as.character(NA),
+                vote_direction = as.character(NA),
+                mnis_id = as.character(NA),
+                member_name = as.character(NA),
+                member_party = as.character(NA),
+                member_constituency = as.character(NA),
+                member_proxy_name = as.character(NA))
+            }
+        )
+
+        # Return
+        divisions
 }
 
 #' Fetch key details on Commons divisions votes grouped by party
@@ -582,9 +613,6 @@ fetch_commons_divisions_members <- function(
     # Check member mnis ID provided
     if (is.null(member_mnis_id)) stop(missing_argument("member_mnis_id"))
 
-    # Check member mnis ID is valid
-    check_mnis_id(member_mnis_id, "commons")
-
     # Fetch
     divisions <- fetch_cds_members_raw(
         member_mnis_id,
@@ -592,21 +620,31 @@ fetch_commons_divisions_members <- function(
         to_date,
         on_date)
 
-    # Join
-    members <- clmnis::fetch_mps()
-    divisions <- dplyr::left_join(divisions, members, by = "mnis_id")
+    if (nrow(divisions) == 0 & ncol(divisions) == 0) stop(invalid_mnis_id(member_mnis_id))
+
+    divisions <- tryCatch({
+
+        # Return
+        divisions %>%
+            dplyr::select(
+                .data$division_id,
+                .data$division_date,
+                .data$division_title,
+                .data$mnis_id,
+                .data$member_voted_aye,
+                .data$member_was_teller)
+        },
+        error = function(c) {
+            tibble::tibble(
+                division_id = as.character(NA),
+                division_date = as.Date(NA),
+                division_title = as.character(NA),
+                mnis_id = as.character(NA),
+                member_voted_aye = as.character(NA),
+                member_was_teller = as.character(NA))
+        }
+    )
 
     # Return
-    divisions %>%
-        dplyr::select(
-            .data$division_id,
-            .data$division_date,
-            .data$division_title,
-            .data$mnis_id,
-            .data$given_name,
-            .data$family_name,
-            .data$display_name,
-            .data$gender,
-            .data$member_voted_aye,
-            .data$member_was_teller)
+    divisions
 }

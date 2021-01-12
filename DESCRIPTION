@@ -1,7 +1,7 @@
 Package: clvotes
 Type: Package
 Title: An R package for downloading data from the Commons and Lords Votes API
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(
         given = "Noel",
@@ -25,7 +25,6 @@ Imports:
     stringr,
     janitor,
     tidyr
-Remotes: houseofcommonslibrary/clmnis
 RoxygenNote: 7.1.1
 Suggests: 
     testthat

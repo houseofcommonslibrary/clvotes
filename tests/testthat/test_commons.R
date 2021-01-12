@@ -108,10 +108,9 @@ test_that("fetch_commons_divisions_tellers processes results correctly.", {
             "division_title",
             "division_lobby",
             "mnis_id",
-            "given_name",
-            "family_name",
-            "display_name",
-            "gender")
+            "member_name",
+            "member_party",
+            "member_constituency")
 
         obs <- fetch_commons_divisions_tellers()
         exp <- read("fetch_commons_divisions_tellers")
@@ -156,11 +155,10 @@ test_that("fetch_commons_divisions_votes processes results correctly.", {
             "division_title",
             "vote_direction",
             "mnis_id",
-            "given_name",
-            "family_name",
-            "display_name",
-            "gender",
-            "member_party")
+            "member_name",
+            "member_party",
+            "member_constituency",
+            "member_proxy_name")
 
         obs <- fetch_commons_divisions_votes(COMMONS_DIVISION_ID)
         exp <- read("fetch_commons_divisions_votes")
@@ -197,10 +195,6 @@ test_that("fetch_commons_divisions_members processes results correctly.", {
             "division_date",
             "division_title",
             "mnis_id",
-            "given_name",
-            "family_name",
-            "display_name",
-            "gender",
             "member_voted_aye",
             "member_was_teller")
 

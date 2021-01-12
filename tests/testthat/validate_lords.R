@@ -80,6 +80,11 @@ fetch_lords_validation_data <- function() {
     write(ldp, "fetch_lords_divisions_votes_party")
     Sys.sleep(API_PAUSE_TIME)
 
+    # Fetch Lords divisions votes by lord type
+    ldlt <- fetch_lords_divisions_lord_type(LORDS_DIVISION_ID)
+    write(ldlt, "fetch_lords_divisions_lord_type")
+    Sys.sleep(API_PAUSE_TIME)
+
     # Fetch Lords divisions members
     ldm <- fetch_lords_divisions_members(LORDS_MEMBER_ID)
     write(ldm, "fetch_lords_divisions_members")
