@@ -55,7 +55,7 @@ clvotes::fetch_commons_divisions_tellers(from_date = NA, to_date = NA, on_date =
 
 Fetch a dataframe of key details about each Commons division teller, with one row per division teller.
 
-This dataframe contains summary details for each division teller, such as the division date, title, the division lobby of the teller, the teller name and teller gender. Divisions with zero tellers are ignored.
+This dataframe contains summary details for each division teller, such as the division date, title, the division lobby of the teller, the teller name and teller party. Divisions with zero tellers are ignored.
 
 ---
 
@@ -75,7 +75,7 @@ clvotes::fetch_commons_divisions_votes(division_id)
 
 Fetch a dataframe of key details about how each MP voted in a Commons division, with one row per MP vote.
 
-This dataframe contains summary details for a division, such as the division date, title, the vote direction of an MP, the MP name, and gender.
+This dataframe contains summary details for a division, such as the division date, title, the vote direction of an MP, the MP name, and proxy used (if any).
 
 ---
 
@@ -120,7 +120,7 @@ clvotes::fetch_lords_divisions_tellers(from_date = NA, to_date = NA, on_date = N
 
 Fetch a dataframe of key details about each Lords division teller, with one row per division teller.
 
-This dataframe contains summary details for each division teller, such as the division date, title, the division lobby of the teller, the teller name and teller gender. Divisions with zero tellers are ignored.
+This dataframe contains summary details for each division teller, such as the division date, title, the division lobby of the teller, the teller name and teller party. Divisions with zero tellers are ignored.
 
 ---
 
@@ -140,7 +140,7 @@ clvotes::fetch_lords_divisions_votes(division_id)
 
 Fetch a dataframe of key details about how each Lord voted in a Lords division, with one row per Lord vote.
 
-This dataframe contains summary details for a division, such as the division date, title, the vote direction of a Lord, the Lord name, and gender.
+This dataframe contains summary details for a division, such as the division date, title, the vote direction of a Lord, the Lord name, and party.
 
 ---
 
