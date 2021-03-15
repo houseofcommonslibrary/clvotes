@@ -109,8 +109,7 @@ test_that("fetch_commons_divisions_tellers processes results correctly.", {
             "division_lobby",
             "mnis_id",
             "member_name",
-            "member_party",
-            "member_constituency")
+            "member_party")
 
         obs <- fetch_commons_divisions_tellers()
         exp <- read("fetch_commons_divisions_tellers")
@@ -157,7 +156,6 @@ test_that("fetch_commons_divisions_votes processes results correctly.", {
             "mnis_id",
             "member_name",
             "member_party",
-            "member_constituency",
             "member_proxy_name")
 
         obs <- fetch_commons_divisions_votes(COMMONS_DIVISION_ID)

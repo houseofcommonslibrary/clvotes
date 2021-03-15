@@ -62,8 +62,7 @@ test_that("fetch_lords_divisions_tellers processes results correctly.", {
                     "division_lobby",
                     "mnis_id",
                     "member_name",
-                    "member_party",
-                    "member_lord_type")
+                    "member_party")
 
                 obs <- fetch_lords_divisions_tellers()
                 exp <- read("fetch_lords_divisions_tellers")
@@ -111,8 +110,7 @@ test_that("fetch_lords_divisions_votes processes results correctly.", {
                     "vote_direction",
                     "mnis_id",
                     "member_name",
-                    "member_party",
-                    "member_lord_type")
+                    "member_party")
 
                 obs <- fetch_lords_divisions_votes(LORDS_DIVISION_ID)
                 exp <- read("fetch_lords_divisions_votes")
@@ -135,25 +133,6 @@ test_that("fetch_lords_divisions_party processes results correctly.", {
 
                 obs <- fetch_lords_divisions_party(LORDS_DIVISION_ID)
                 exp <- read("fetch_lords_divisions_votes_party")
-                compare_obs_exp(obs, exp, cols, "division_id")
-            })
-})
-
-test_that("fetch_lords_divisions_lord_type processes results correctly.", {
-    with_mock(
-        "clvotes::request" = mock_request(
-            mock_fetch_lords_votes), {
-
-                cols <- c(
-                    "division_id",
-                    "division_date",
-                    "division_title",
-                    "member_lord_type",
-                    "vote_direction",
-                    "vote_count")
-
-                obs <- fetch_lords_divisions_lord_type(LORDS_DIVISION_ID)
-                exp <- read("fetch_lords_divisions_lord_type")
                 compare_obs_exp(obs, exp, cols, "division_id")
             })
 })

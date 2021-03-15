@@ -155,16 +155,6 @@ This dataframe contains summary details for a division, such as the division dat
 --- 
 
 ```r
-clvotes::fetch_lords_divisions_lord_type(division_id)
-```
-
-Fetch a dataframe of key details about how each lord type voted in a Lords division, with one row per lord type vote direction.
-
-This dataframe contains summary details for a division, such as the division date, title, lord type and each vote direction.
-
---- 
-
-```r
 clvotes::fetch_lords_divisions_members(member_mnis_id, from_date = NA, to_date = NA, on_date = NA)
 ```
 

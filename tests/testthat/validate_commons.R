@@ -127,5 +127,6 @@ fetch_commons_test_data <- function() {
     fetch_commons_validation_data()
 }
 
+fetch_commons_test_data()
 
 

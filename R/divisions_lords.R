@@ -215,8 +215,7 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$member_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
+                .data$party)
 
         not_content_tellers <- divisions %>%
             tidyr::unnest(.data$not_content_tellers) %>%
@@ -230,8 +229,7 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$member_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
+                .data$party)
 
         # Bind
         divisions <- dplyr::bind_rows(content_tellers, not_content_tellers)
@@ -239,8 +237,7 @@ fetch_lords_divisions_tellers <- function(
             dplyr::rename(
                 mnis_id = member_id,
                 member_name = name,
-                member_party = party,
-                member_lord_type = member_from)
+                member_party = party)
         divisions$mnis_id <- as.character(divisions$mnis_id)
 
         # Return
@@ -252,8 +249,7 @@ fetch_lords_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$mnis_id,
                 .data$member_name,
-                .data$member_party,
-                .data$member_lord_type)
+                .data$member_party)
         },
         error = function(c) {
             tibble::tibble(
@@ -263,8 +259,7 @@ fetch_lords_divisions_tellers <- function(
                 division_lobby = as.character(NA),
                 mnis_id = as.character(NA),
                 member_name = as.character(NA),
-                member_party = as.character(NA),
-                member_lord_type = as.character(NA))
+                member_party = as.character(NA))
         }
     )
     # Return
@@ -355,8 +350,7 @@ fetch_lords_divisions_votes <- function(division_id) {
                 .data$vote_direction,
                 .data$mnis_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
+                .data$party)
 
         # Extract not content votes
         not_content_votes <- divisions %>%
@@ -370,9 +364,7 @@ fetch_lords_divisions_votes <- function(division_id) {
                 .data$vote_direction,
                 .data$mnis_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
-
+                .data$party)
         # Bind
         divisions <- dplyr::bind_rows(content_votes, not_content_votes)
 
@@ -381,8 +373,7 @@ fetch_lords_divisions_votes <- function(division_id) {
             dplyr::rename(
                 mnis_id = mnis_id,
                 member_name = name,
-                member_party = party,
-                member_lord_type = member_from) %>%
+                member_party = party) %>%
             dplyr::select(
                 .data$division_id,
                 .data$division_date,
@@ -390,8 +381,7 @@ fetch_lords_divisions_votes <- function(division_id) {
                 .data$vote_direction,
                 .data$mnis_id,
                 .data$member_name,
-                .data$member_party,
-                .data$member_lord_type)
+                .data$member_party)
         },
         error = function(c) {
             tibble::tibble(
@@ -401,8 +391,7 @@ fetch_lords_divisions_votes <- function(division_id) {
                 vote_direction = as.character(NA),
                 mnis_id = as.character(NA),
                 member_name = as.character(NA),
-                member_party = as.character(NA),
-                member_lord_type = as.character(NA))
+                member_party = as.character(NA))
         }
     )
 
@@ -444,42 +433,6 @@ fetch_lords_divisions_party <- function(division_id) {
             vote_direction,
             member_party)
 }
-
-#' Fetch key details on Lords divisions votes grouped by lord type
-#'
-#' \code{fetch_lords_divisions_lord_type} fetches data from the Lords Votes API
-#' showing key details about each division vote grouped by lord type, with one
-#' row per division grouped vote.
-#'
-#' @param division_id An integer or vector of integers representing a division
-#' ID.
-#' @return A tibble of key details of voting grouped by lord type for a Lords
-#' division, with one row per grouped vote.
-#' @export
-
-fetch_lords_divisions_lord_type <- function(division_id) {
-
-    # Check division ID provided
-    if (is.null(division_id)) stop(missing_argument("division_id"))
-
-    # Fetch
-    divisions <- fetch_lords_divisions_votes(division_id)
-
-    # Return
-    divisions %>%
-        dplyr::group_by(
-            division_id,
-            division_date,
-            division_title,
-            member_lord_type) %>%
-        dplyr::count(vote_direction) %>%
-        dplyr::rename(vote_count = n) %>%
-        dplyr::arrange(
-            division_id,
-            vote_direction,
-            member_lord_type)
-}
-
 
 #' Fetch key details Lords voting record for divisions
 #'

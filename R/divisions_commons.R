@@ -321,8 +321,7 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$member_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
+                .data$party)
 
         no_tellers <- divisions %>%
             tidyr::unnest(.data$no_tellers) %>%
@@ -336,8 +335,7 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$member_id,
                 .data$name,
-                .data$party,
-                .data$member_from)
+                .data$party)
 
         # Bind
         divisions <- dplyr::bind_rows(aye_tellers, no_tellers)
@@ -345,8 +343,7 @@ fetch_commons_divisions_tellers <- function(
             dplyr::rename(
                 mnis_id = member_id,
                 member_name = name,
-                member_party = party,
-                member_constituency = member_from)
+                member_party = party)
         divisions$mnis_id <- as.character(divisions$mnis_id)
 
         # Return
@@ -358,8 +355,7 @@ fetch_commons_divisions_tellers <- function(
                 .data$division_lobby,
                 .data$mnis_id,
                 .data$member_name,
-                .data$member_party,
-                .data$member_constituency)
+                .data$member_party)
         },
         error = function(c) {
             tibble::tibble(
@@ -369,8 +365,7 @@ fetch_commons_divisions_tellers <- function(
                 division_lobby = as.character(NA),
                 mnis_id = as.character(NA),
                 member_name = as.character(NA),
-                member_party = as.character(NA),
-                member_constituency = as.character(NA))
+                member_party = as.character(NA))
         }
     )
 
@@ -463,7 +458,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
                 .data$mnis_id,
                 .data$name,
                 .data$party,
-                .data$member_from,
                 .data$proxy_name)
 
         # Extract no votes
@@ -479,7 +473,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
                 .data$mnis_id,
                 .data$name,
                 .data$party,
-                .data$member_from,
                 .data$proxy_name)
 
         # Extract didn't vote
@@ -495,7 +488,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
                 .data$mnis_id,
                 .data$name,
                 .data$party,
-                .data$member_from,
                 .data$proxy_name)
 
         # Bind
@@ -504,7 +496,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
             dplyr::rename(
                 member_name = name,
                 member_party = party,
-                member_constituency = member_from,
                 member_proxy_name = proxy_name)
         divisions$mnis_id <- as.character(divisions$mnis_id)
 
@@ -518,7 +509,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
                 .data$mnis_id,
                 .data$member_name,
                 .data$member_party,
-                .data$member_constituency,
                 .data$member_proxy_name)
             },
             error = function(c) {
@@ -530,7 +520,6 @@ fetch_commons_divisions_votes <- function(division_id = NULL) {
                 mnis_id = as.character(NA),
                 member_name = as.character(NA),
                 member_party = as.character(NA),
-                member_constituency = as.character(NA),
                 member_proxy_name = as.character(NA))
             }
         )
